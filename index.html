@@ -3,205 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J-Event Slot v.0.2</title>
+    <title>J-Event Slot v.0.3</title>
     <style>
-        /* CSS: Update v.0.2 - Sky Blue Theme */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: #333;
+            margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
-
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
+            background: white; padding: 25px; border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15); width: 90%; max-width: 400px; text-align: center;
         }
-
         .version-tag { font-size: 0.7rem; color: #888; float: right; }
-        h1 { font-size: 1.6rem; margin: 10px 0; color: #0984e3; }
-        .instruction { font-size: 0.9rem; margin-bottom: 20px; color: #636e72; }
-
+        h1 { color: #0984e3; margin: 10px 0; }
         .slot-machine {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            background: #2d3436;
-            padding: 20px;
-            border-radius: 15px;
-            border: 5px solid #74b9ff;
-            margin-bottom: 25px;
+            display: flex; justify-content: center; gap: 10px;
+            background: #2d3436; padding: 20px; border-radius: 15px; border: 5px solid #74b9ff; margin-bottom: 20px;
         }
-
         .slot {
-            width: 85px;
-            height: 110px;
-            background: white;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3rem;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            width: 80px; height: 100px; background: white; border-radius: 10px;
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
-
+        .slot img { width: 70%; height: auto; } /* Ikon berupa Gambar */
         .spinning { animation: blurMove 0.1s infinite; }
         @keyframes blurMove {
-            0% { transform: translateY(-8px); filter: blur(2px); }
-            100% { transform: translateY(8px); filter: blur(2px); }
+            0% { transform: translateY(-5px); filter: blur(1px); }
+            100% { transform: translateY(5px); filter: blur(1px); }
         }
-
         button {
-            width: 100%;
-            padding: 16px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: 0.3s;
+            width: 100%; padding: 16px; font-size: 1.2rem; font-weight: bold;
+            border: none; border-radius: 50px; cursor: pointer; transition: 0.3s;
         }
-
-        #spin-btn {
-            background: #0984e3;
-            color: white;
-            box-shadow: 0 6px 0 #0652dd;
-        }
-
-        #spin-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #0652dd;
-        }
-
-        #spin-btn:disabled {
-            background: #b2bec3;
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        #result-section {
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 15px;
-            background: #e1f5fe;
-            border: 2px solid #81d4fa;
-            display: none;
-        }
-
-        .prize-text { font-size: 1.3rem; font-weight: 800; color: #d63031; margin-bottom: 5px; }
-        
-        .staff-area {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #b2bec3;
-        }
-
-        .staff-btn {
-            background: transparent;
-            color: #636e72;
-            font-size: 0.75rem;
-            text-decoration: underline;
-            padding: 5px;
-        }
+        #spin-btn { background: #0984e3; color: white; box-shadow: 0 6px 0 #0652dd; }
+        #spin-btn:disabled { background: #b2bec3; box-shadow: none; }
+        #result-section { margin-top: 20px; padding: 15px; border-radius: 15px; background: #e1f5fe; display: none; }
+        .prize-text { font-size: 1.3rem; font-weight: 800; color: #d63031; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <span class="version-tag">v.0.2</span>
+        <span class="version-tag">v.0.3</span>
         <h1>?? J-Event Slot</h1>
-        <p class="instruction">Coba keberuntunganmu hari ini!</p>
+        <p>Coba keberuntunganmu!</p>
 
         <div class="slot-machine">
-            <div id="slot1" class="slot">??</div>
-            <div id="slot2" class="slot">??</div>
-            <div id="slot3" class="slot">??</div>
+            <div id="slot1" class="slot"><img src="https://openmoji.org/data/color/svg/1F338.svg"></div>
+            <div id="slot2" class="slot"><img src="https://openmoji.org/data/color/svg/1F363.svg"></div>
+            <div id="slot3" class="slot"><img src="https://openmoji.org/data/color/svg/26E9.svg"></div>
         </div>
 
         <button id="spin-btn" onclick="startSpin()">TEKAN UNTUK SPIN</button>
 
         <div id="result-section">
             <div id="prize-display" class="prize-text"></div>
-            <p style="font-size: 0.85rem; color: #2d3436;">Tunjukkan ke panitia untuk ambil hadiah!</p>
-            
-            <div class="staff-area">
-                <button class="staff-btn" onclick="resetGame()">Petugas Reset (PIN)</button>
-            </div>
+            <p>Tunjukkan ke panitia!</p>
+            <button style="background:none; color:gray; font-size:0.7rem; text-decoration:underline;" onclick="resetGame()">Petugas Reset</button>
         </div>
     </div>
 
     <script>
-        const EMOJIS = ['??', '??', '??', '??', '??', '??'];
-        const STORAGE_KEY = 'hogi_event_v02'; // Key baru untuk v0.2
+        // Menggunakan URL Ikon PNG/SVG agar pasti muncul di semua HP
+        const ICON_URLS = [
+            'https://openmoji.org/data/color/svg/1F338.svg', // Sakura
+            'https://openmoji.org/data/color/svg/26E9.svg',  // Torii
+            'https://openmoji.org/data/color/svg/1F363.svg', // Sushi
+            'https://openmoji.org/data/color/svg/1F43A.svg', // Wolf/Fox
+            'https://openmoji.org/data/color/svg/1F47B.svg', // Ghost
+            'https://openmoji.org/data/color/svg/1F3EE.svg'  // Lantern
+        ];
         
+        const STORAGE_KEY = 'hogi_event_v03';
         const spinBtn = document.getElementById('spin-btn');
         const resultSection = document.getElementById('result-section');
         const prizeDisplay = document.getElementById('prize-display');
-        const slots = [
-            document.getElementById('slot1'),
-            document.getElementById('slot2'),
-            document.getElementById('slot3')
-        ];
+        const slots = [document.getElementById('slot1'), document.getElementById('slot2'), document.getElementById('slot3')];
 
         window.onload = () => {
-            const savedStatus = localStorage.getItem(STORAGE_KEY);
-            if (savedStatus) {
-                prizeDisplay.innerText = savedStatus;
-                resultSection.style.display = 'block';
-                disableGame();
-            }
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) { prizeDisplay.innerText = saved; resultSection.style.display = 'block'; disableGame(); }
         };
 
         function startSpin() {
             spinBtn.disabled = true;
             slots.forEach(slot => slot.classList.add('spinning'));
-
-            // Simulasi acak saat berputar
-            const spinInterval = setInterval(() => {
+            
+            const interval = setInterval(() => {
                 slots.forEach(slot => {
-                    slot.innerText = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+                    slot.innerHTML = `<img src="${ICON_URLS[Math.floor(Math.random() * ICON_URLS.length)]}">`;
                 });
             }, 100);
 
             setTimeout(() => {
-                clearInterval(spinInterval);
+                clearInterval(interval);
                 stopSpin();
             }, 2000);
         }
 
         function stopSpin() {
             slots.forEach(slot => slot.classList.remove('spinning'));
-
             const results = [
-                EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
-                EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
-                EMOJIS[Math.floor(Math.random() * EMOJIS.length)]
+                ICON_URLS[Math.floor(Math.random() * ICON_URLS.length)],
+                ICON_URLS[Math.floor(Math.random() * ICON_URLS.length)],
+                ICON_URLS[Math.floor(Math.random() * ICON_URLS.length)]
             ];
 
-            slots.forEach((slot, index) => {
-                slot.innerText = results[index];
-            });
+            slots.forEach((slot, i) => slot.innerHTML = `<img src="${results[i]}">`);
 
-            let prize = "";
-            const uniqueItems = new Set(results).size;
-
-            if (uniqueItems === 1) {
-                prize = "JACKPOT: POSTER! ??";
-            } else if (uniqueItems === 2) {
-                prize = "MENANG: GANCI! ?";
-            } else {
-                prize = "HADIAH: STIKER! ??";
-            }
+            const unique = new Set(results).size;
+            let prize = (unique === 1) ? "JACKPOT: POSTER! ??" : (unique === 2) ? "MENANG: GANCI! ?" : "HADIAH: STIKER! ??";
 
             localStorage.setItem(STORAGE_KEY, prize);
             prizeDisplay.innerText = prize;
@@ -209,20 +119,10 @@
             disableGame();
         }
 
-        function disableGame() {
-            spinBtn.disabled = true;
-            spinBtn.innerText = "KESEMPATAN HABIS";
-            spinBtn.style.background = "#b2bec3";
-        }
+        function disableGame() { spinBtn.disabled = true; spinBtn.innerText = "KESEMPATAN HABIS"; }
 
         function resetGame() {
-            let pin = prompt("PIN Petugas:");
-            if (pin === "1234") {
-                localStorage.removeItem(STORAGE_KEY);
-                location.reload();
-            } else {
-                alert("PIN Salah!");
-            }
+            if (prompt("PIN:") === "1234") { localStorage.removeItem(STORAGE_KEY); location.reload(); }
         }
     </script>
 </body>
