@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japan Event - Slot Keberuntungan</title>
+    <style>
+        /* CSS: Desain Responsif Mobile-First */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 { font-size: 1.5rem; margin-bottom: 10px; color: #d63031; }
+        .instruction { font-size: 0.9rem; margin-bottom: 20px; opacity: 0.8; }
+
+        /* Slot Machine Styles */
+        .slot-machine {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            background: #2d3436;
+            padding: 15px;
+            border-radius: 15px;
+            border: 5px solid #fab1a0;
+            margin-bottom: 20px;
+        }
+
+        .slot {
+            width: 80px;
+            height: 100px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            transition: transform 0.1s;
+        }
+
+        .spinning {
+            animation: shake 0.1s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translateY(-5px); }
+            100% { transform: translateY(5px); }
+        }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #spin-btn {
+            background: #d63031;
+            color: white;
+            box-shadow: 0 5px 0 #b32d2d;
+        }
+
+        #spin-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #b32d2d;
+        }
+
+        #spin-btn:disabled {
+            background: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Result Section */
+        #result-section {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #fff;
+            display: none; /* Sembunyi sampai dimainkan */
+        }
+
+        .prize-text { font-size: 1.2rem; font-weight: bold; color: #e17055; }
+        
+        .staff-area {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed #ccc;
+        }
+
+        .staff-btn {
+            background: #636e72;
+            color: white;
+            font-size: 0.8rem;
+            padding: 8px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🌸 J-Event Slot 🌸</h1>
+        <p class="instruction">Scan, Spin, dan Menangkan Hadiah!</p>
+
+        <div class="slot-machine">
+            <div id="slot1" class="slot">❓</div>
+            <div id="slot2" class="slot">❓</div>
+            <div id="slot3" class="slot">❓</div>
+        </div>
+
+        <button id="spin-btn" onclick="startSpin()">MULAI SPIN!</button>
+
+        <div id="result-section">
+            <div id="prize-display" class="prize-text"></div>
+            <p style="font-size: 0.8rem;">Tunjukkan layar ini ke Panitia untuk klaim.</p>
+            
+            <div class="staff-area">
+                <button class="staff-btn" onclick="resetGame()">Hanya Petugas (Reset)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // KONFIGURASI GAME
+        const EMOJIS = ['🌸', '⛩️', '🍣', '🦊', '👺', '🎎'];
+        const STORAGE_KEY = 'event_slot_user_status';
+        
+        const spinBtn = document.getElementById('spin-btn');
+        const resultSection = document.getElementById('result-section');
+        const prizeDisplay = document.getElementById('prize-display');
+        const slots = [
+            document.getElementById('slot1'),
+            document.getElementById('slot2'),
+            document.getElementById('slot3')
+        ];
+
+        // 1. Cek apakah user sudah pernah main saat halaman dibuka
+        window.onload = () => {
+            const savedStatus = localStorage.getItem(STORAGE_KEY);
+            if (savedStatus) {
+                showFinalResult(savedStatus);
+                disableGame();
+            }
+        };
+
+        function startSpin() {
+            spinBtn.disabled = true;
+            
+            // Tambahkan efek animasi berputar
+            slots.forEach(slot => slot.classList.add('spinning'));
+
+            // Durasi putaran (2 detik)
+            setTimeout(() => {
+                stopSpin();
+            }, 2000);
+        }
+
+        function stopSpin() {
+            slots.forEach(slot => slot.classList.remove('spinning'));
+
+            // Ambil hasil acak
+            const results = [
+                EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
+                EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
+                EMOJIS[Math.floor(Math.random() * EMOJIS.length)]
+            ];
+
+            // Tampilkan hasil di kotak slot
+            slots.forEach((slot, index) => {
+                slot.innerText = results[index];
+            });
+
+            // Tentukan hadiah
+            let prize = "";
+            const uniqueItems = new Set(results).size;
+
+            if (uniqueItems === 1) {
+                prize = "JACKPOT: POSTER! 🏆";
+            } else if (uniqueItems === 2) {
+                prize = "MENANG: GANCI! ✨";
+            } else {
+                prize = "HADIAH: STIKER! 🌸";
+            }
+
+            // Simpan status ke localStorage agar tidak bisa refresh
+            localStorage.setItem(STORAGE_KEY, prize);
+            
+            showFinalResult(prize);
+        }
+
+        function showFinalResult(prizeText) {
+            resultSection.style.display = 'block';
+            prizeDisplay.innerText = prizeText;
+            spinBtn.innerText = "Selesai Bermain";
+            spinBtn.disabled = true;
+        }
+
+        function disableGame() {
+            spinBtn.disabled = true;
+            spinBtn.innerText = "Sudah Bermain";
+        }
+
+        // Fungsi Reset untuk Panitia
+        function resetGame() {
+            let password = prompt("Masukkan PIN Petugas untuk Reset:");
+            if (password === "1234") { // Ganti PIN ini sesukamu
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            } else {
+                alert("PIN Salah!");
+            }
+        }
+    </script>
+</body>
+</html>
