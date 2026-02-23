@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J-Event Slot v.0.4</title>
+    <title>J-Event Slot v.0.5 - Auto Reset</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -15,12 +15,9 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.15); width: 90%; max-width: 400px; text-align: center;
         }
         .version-tag { font-size: 0.7rem; color: #888; float: right; }
-        
-        /* Judul menggunakan Ikon Gambar agar tidak jadi ?? */
         .title-area { display: flex; align-items: center; justify-content: center; gap: 10px; }
         .title-icon { width: 30px; height: 30px; }
         h1 { color: #0984e3; margin: 10px 0; font-size: 1.5rem; }
-
         .slot-machine {
             display: flex; justify-content: center; gap: 10px;
             background: #2d3436; padding: 20px; border-radius: 15px; border: 5px solid #74b9ff; margin-bottom: 20px;
@@ -30,20 +27,17 @@
             display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
         .slot img { width: 70%; height: auto; }
-        
         .spinning { animation: blurMove 0.1s infinite; }
         @keyframes blurMove {
             0% { transform: translateY(-5px); filter: blur(1px); }
             100% { transform: translateY(5px); filter: blur(1px); }
         }
-
         button {
             width: 100%; padding: 16px; font-size: 1.2rem; font-weight: bold;
             border: none; border-radius: 50px; cursor: pointer; transition: 0.3s;
         }
         #spin-btn { background: #0984e3; color: white; box-shadow: 0 6px 0 #0652dd; }
         #spin-btn:disabled { background: #b2bec3; box-shadow: none; }
-
         #result-section { 
             margin-top: 20px; padding: 15px; border-radius: 15px; 
             background: #e1f5fe; border: 2px solid #81d4fa; display: none; 
@@ -55,13 +49,13 @@
 <body>
 
     <div class="container">
-        <span class="version-tag">v.0.4</span>
+        <span class="version-tag">v.0.5</span>
         <div class="title-area">
             <img src="https://openmoji.org/data/color/svg/1F3A1.svg" class="title-icon">
             <h1>J-Event Slot</h1>
             <img src="https://openmoji.org/data/color/svg/1F3A1.svg" class="title-icon">
         </div>
-        <p style="font-size: 0.9rem; color: #636e72;">Coba keberuntunganmu!</p>
+        <p style="font-size: 0.8rem; color: #636e72;">Kesempatan reset setiap 24 jam!</p>
 
         <div class="slot-machine">
             <div id="slot1" class="slot"><img src="https://openmoji.org/data/color/svg/1F338.svg"></div>
@@ -73,59 +67,74 @@
 
         <div id="result-section">
             <div id="prize-display" class="prize-text"></div>
-            <p style="font-size: 0.8rem; margin-top: 10px;">Tunjukkan ke panitia untuk ambil hadiah!</p>
-            <button style="background:none; color:gray; font-size:0.7rem; text-decoration:underline; width: auto; padding: 5px;" onclick="resetGame()">Petugas Reset</button>
+            <p id="cooldown-timer" style="font-size: 0.75rem; color: #2d3436; margin-top: 10px;"></p>
+            <button style="background:none; color:gray; font-size:0.7rem; text-decoration:underline; width: auto; padding: 5px;" onclick="resetGame()">Reset Petugas (PIN)</button>
         </div>
     </div>
 
     <script>
-        // Menggunakan Gambar (SVG) untuk menghindari Tanda Tanya (??)
         const ICONS = [
-            { url: 'https://openmoji.org/data/color/svg/1F338.svg', label: 'SAKURA' },
-            { url: 'https://openmoji.org/data/color/svg/26E9.svg',  label: 'TORII' },
-            { url: 'https://openmoji.org/data/color/svg/1F363.svg', label: 'SUSHI' },
-            { url: 'https://openmoji.org/data/color/svg/1F43A.svg', label: 'WOLF' },
-            { url: 'https://openmoji.org/data/color/svg/1F47B.svg', label: 'GHOST' },
-            { url: 'https://openmoji.org/data/color/svg/1F3EE.svg', label: 'LANTERN' }
+            { url: 'https://openmoji.org/data/color/svg/1F338.svg' },
+            { url: 'https://openmoji.org/data/color/svg/26E9.svg' },
+            { url: 'https://openmoji.org/data/color/svg/1F363.svg' },
+            { url: 'https://openmoji.org/data/color/svg/1F43A.svg' },
+            { url: 'https://openmoji.org/data/color/svg/1F47B.svg' },
+            { url: 'https://openmoji.org/data/color/svg/1F3EE.svg' }
         ];
 
-        // Ikon untuk tampilan hadiah
         const PRIZE_ICONS = {
             jackpot: 'https://openmoji.org/data/color/svg/1F3C6.svg',
             win: 'https://openmoji.org/data/color/svg/2728.svg',
             normal: 'https://openmoji.org/data/color/svg/1F338.svg'
         };
         
-        const STORAGE_KEY = 'hogi_event_v04';
+        const STORAGE_KEY = 'hogi_slot_prize';
+        const TIME_KEY = 'hogi_slot_time';
+        const COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 Jam
+
         const spinBtn = document.getElementById('spin-btn');
         const resultSection = document.getElementById('result-section');
         const prizeDisplay = document.getElementById('prize-display');
+        const timerText = document.getElementById('cooldown-timer');
         const slots = [document.getElementById('slot1'), document.getElementById('slot2'), document.getElementById('slot3')];
 
         window.onload = () => {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) { 
-                prizeDisplay.innerHTML = saved; 
-                resultSection.style.display = 'block'; 
-                disableGame(); 
-            }
+            checkCooldown();
         };
+
+        function checkCooldown() {
+            const lastPlay = localStorage.getItem(TIME_KEY);
+            const savedPrize = localStorage.getItem(STORAGE_KEY);
+
+            if (lastPlay && savedPrize) {
+                const elapsed = Date.now() - parseInt(lastPlay);
+                
+                if (elapsed < COOLDOWN_MS) {
+                    // Masih dalam masa tunggu
+                    prizeDisplay.innerHTML = savedPrize;
+                    resultSection.style.display = 'block';
+                    disableGame();
+                    
+                    const remainingMs = COOLDOWN_MS - elapsed;
+                    const hoursLeft = Math.ceil(remainingMs / (1000 * 60 * 60));
+                    timerText.innerText = `Kamu sudah main. Bisa main lagi dalam ${hoursLeft} jam.`;
+                } else {
+                    // Sudah lewat 24 jam, hapus data lama
+                    localStorage.removeItem(STORAGE_KEY);
+                    localStorage.removeItem(TIME_KEY);
+                }
+            }
+        }
 
         function startSpin() {
             spinBtn.disabled = true;
             slots.forEach(slot => slot.classList.add('spinning'));
-            
             const interval = setInterval(() => {
                 slots.forEach(slot => {
-                    const randomIcon = ICONS[Math.floor(Math.random() * ICONS.length)].url;
-                    slot.innerHTML = `<img src="${randomIcon}">`;
+                    slot.innerHTML = `<img src="${ICONS[Math.floor(Math.random() * ICONS.length)].url}">`;
                 });
             }, 100);
-
-            setTimeout(() => {
-                clearInterval(interval);
-                stopSpin();
-            }, 2000);
+            setTimeout(() => { clearInterval(interval); stopSpin(); }, 2000);
         }
 
         function stopSpin() {
@@ -135,24 +144,21 @@
                 ICONS[Math.floor(Math.random() * ICONS.length)].url,
                 ICONS[Math.floor(Math.random() * ICONS.length)].url
             ];
-
             slots.forEach((slot, i) => slot.innerHTML = `<img src="${results[i]}">`);
 
             const unique = new Set(results).size;
             let prizeHTML = "";
-
-            if (unique === 1) {
-                prizeHTML = `POSTER! <img src="${PRIZE_ICONS.jackpot}" class="prize-icon">`;
-            } else if (unique === 2) {
-                prizeHTML = `GANCI! <img src="${PRIZE_ICONS.win}" class="prize-icon">`;
-            } else {
-                prizeHTML = `STIKER! <img src="${PRIZE_ICONS.normal}" class="prize-icon">`;
-            }
+            if (unique === 1) prizeHTML = `POSTER! <img src="${PRIZE_ICONS.jackpot}" class="prize-icon">`;
+            else if (unique === 2) prizeHTML = `GANCI! <img src="${PRIZE_ICONS.win}" class="prize-icon">`;
+            else prizeHTML = `STIKER! <img src="${PRIZE_ICONS.normal}" class="prize-icon">`;
 
             localStorage.setItem(STORAGE_KEY, prizeHTML);
+            localStorage.setItem(TIME_KEY, Date.now().toString());
+            
             prizeDisplay.innerHTML = prizeHTML;
             resultSection.style.display = 'block';
             disableGame();
+            timerText.innerText = "Terima kasih sudah bermain! Cek lagi besok.";
         }
 
         function disableGame() { 
@@ -162,7 +168,7 @@
 
         function resetGame() {
             if (prompt("PIN Petugas:") === "1234") { 
-                localStorage.removeItem(STORAGE_KEY); 
+                localStorage.clear(); 
                 location.reload(); 
             }
         }
