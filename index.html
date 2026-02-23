@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J-Event Slot v.0.3</title>
+    <title>J-Event Slot v.0.4</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -15,7 +15,12 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.15); width: 90%; max-width: 400px; text-align: center;
         }
         .version-tag { font-size: 0.7rem; color: #888; float: right; }
-        h1 { color: #0984e3; margin: 10px 0; }
+        
+        /* Judul menggunakan Ikon Gambar agar tidak jadi ?? */
+        .title-area { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .title-icon { width: 30px; height: 30px; }
+        h1 { color: #0984e3; margin: 10px 0; font-size: 1.5rem; }
+
         .slot-machine {
             display: flex; justify-content: center; gap: 10px;
             background: #2d3436; padding: 20px; border-radius: 15px; border: 5px solid #74b9ff; margin-bottom: 20px;
@@ -24,28 +29,39 @@
             width: 80px; height: 100px; background: white; border-radius: 10px;
             display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
-        .slot img { width: 70%; height: auto; } /* Ikon berupa Gambar */
+        .slot img { width: 70%; height: auto; }
+        
         .spinning { animation: blurMove 0.1s infinite; }
         @keyframes blurMove {
             0% { transform: translateY(-5px); filter: blur(1px); }
             100% { transform: translateY(5px); filter: blur(1px); }
         }
+
         button {
             width: 100%; padding: 16px; font-size: 1.2rem; font-weight: bold;
             border: none; border-radius: 50px; cursor: pointer; transition: 0.3s;
         }
         #spin-btn { background: #0984e3; color: white; box-shadow: 0 6px 0 #0652dd; }
         #spin-btn:disabled { background: #b2bec3; box-shadow: none; }
-        #result-section { margin-top: 20px; padding: 15px; border-radius: 15px; background: #e1f5fe; display: none; }
-        .prize-text { font-size: 1.3rem; font-weight: 800; color: #d63031; }
+
+        #result-section { 
+            margin-top: 20px; padding: 15px; border-radius: 15px; 
+            background: #e1f5fe; border: 2px solid #81d4fa; display: none; 
+        }
+        .prize-text { font-size: 1.3rem; font-weight: 800; color: #d63031; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .prize-icon { width: 25px; height: 25px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <span class="version-tag">v.0.3</span>
-        <h1>?? J-Event Slot</h1>
-        <p>Coba keberuntunganmu!</p>
+        <span class="version-tag">v.0.4</span>
+        <div class="title-area">
+            <img src="https://openmoji.org/data/color/svg/1F3A1.svg" class="title-icon">
+            <h1>J-Event Slot</h1>
+            <img src="https://openmoji.org/data/color/svg/1F3A1.svg" class="title-icon">
+        </div>
+        <p style="font-size: 0.9rem; color: #636e72;">Coba keberuntunganmu!</p>
 
         <div class="slot-machine">
             <div id="slot1" class="slot"><img src="https://openmoji.org/data/color/svg/1F338.svg"></div>
@@ -57,23 +73,30 @@
 
         <div id="result-section">
             <div id="prize-display" class="prize-text"></div>
-            <p>Tunjukkan ke panitia!</p>
-            <button style="background:none; color:gray; font-size:0.7rem; text-decoration:underline;" onclick="resetGame()">Petugas Reset</button>
+            <p style="font-size: 0.8rem; margin-top: 10px;">Tunjukkan ke panitia untuk ambil hadiah!</p>
+            <button style="background:none; color:gray; font-size:0.7rem; text-decoration:underline; width: auto; padding: 5px;" onclick="resetGame()">Petugas Reset</button>
         </div>
     </div>
 
     <script>
-        // Menggunakan URL Ikon PNG/SVG agar pasti muncul di semua HP
-        const ICON_URLS = [
-            'https://openmoji.org/data/color/svg/1F338.svg', // Sakura
-            'https://openmoji.org/data/color/svg/26E9.svg',  // Torii
-            'https://openmoji.org/data/color/svg/1F363.svg', // Sushi
-            'https://openmoji.org/data/color/svg/1F43A.svg', // Wolf/Fox
-            'https://openmoji.org/data/color/svg/1F47B.svg', // Ghost
-            'https://openmoji.org/data/color/svg/1F3EE.svg'  // Lantern
+        // Menggunakan Gambar (SVG) untuk menghindari Tanda Tanya (??)
+        const ICONS = [
+            { url: 'https://openmoji.org/data/color/svg/1F338.svg', label: 'SAKURA' },
+            { url: 'https://openmoji.org/data/color/svg/26E9.svg',  label: 'TORII' },
+            { url: 'https://openmoji.org/data/color/svg/1F363.svg', label: 'SUSHI' },
+            { url: 'https://openmoji.org/data/color/svg/1F43A.svg', label: 'WOLF' },
+            { url: 'https://openmoji.org/data/color/svg/1F47B.svg', label: 'GHOST' },
+            { url: 'https://openmoji.org/data/color/svg/1F3EE.svg', label: 'LANTERN' }
         ];
+
+        // Ikon untuk tampilan hadiah
+        const PRIZE_ICONS = {
+            jackpot: 'https://openmoji.org/data/color/svg/1F3C6.svg',
+            win: 'https://openmoji.org/data/color/svg/2728.svg',
+            normal: 'https://openmoji.org/data/color/svg/1F338.svg'
+        };
         
-        const STORAGE_KEY = 'hogi_event_v03';
+        const STORAGE_KEY = 'hogi_event_v04';
         const spinBtn = document.getElementById('spin-btn');
         const resultSection = document.getElementById('result-section');
         const prizeDisplay = document.getElementById('prize-display');
@@ -81,7 +104,11 @@
 
         window.onload = () => {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) { prizeDisplay.innerText = saved; resultSection.style.display = 'block'; disableGame(); }
+            if (saved) { 
+                prizeDisplay.innerHTML = saved; 
+                resultSection.style.display = 'block'; 
+                disableGame(); 
+            }
         };
 
         function startSpin() {
@@ -90,7 +117,8 @@
             
             const interval = setInterval(() => {
                 slots.forEach(slot => {
-                    slot.innerHTML = `<img src="${ICON_URLS[Math.floor(Math.random() * ICON_URLS.length)]}">`;
+                    const randomIcon = ICONS[Math.floor(Math.random() * ICONS.length)].url;
+                    slot.innerHTML = `<img src="${randomIcon}">`;
                 });
             }, 100);
 
@@ -103,26 +131,40 @@
         function stopSpin() {
             slots.forEach(slot => slot.classList.remove('spinning'));
             const results = [
-                ICON_URLS[Math.floor(Math.random() * ICON_URLS.length)],
-                ICON_URLS[Math.floor(Math.random() * ICON_URLS.length)],
-                ICON_URLS[Math.floor(Math.random() * ICON_URLS.length)]
+                ICONS[Math.floor(Math.random() * ICONS.length)].url,
+                ICONS[Math.floor(Math.random() * ICONS.length)].url,
+                ICONS[Math.floor(Math.random() * ICONS.length)].url
             ];
 
             slots.forEach((slot, i) => slot.innerHTML = `<img src="${results[i]}">`);
 
             const unique = new Set(results).size;
-            let prize = (unique === 1) ? "JACKPOT: POSTER! ??" : (unique === 2) ? "MENANG: GANCI! ?" : "HADIAH: STIKER! ??";
+            let prizeHTML = "";
 
-            localStorage.setItem(STORAGE_KEY, prize);
-            prizeDisplay.innerText = prize;
+            if (unique === 1) {
+                prizeHTML = `POSTER! <img src="${PRIZE_ICONS.jackpot}" class="prize-icon">`;
+            } else if (unique === 2) {
+                prizeHTML = `GANCI! <img src="${PRIZE_ICONS.win}" class="prize-icon">`;
+            } else {
+                prizeHTML = `STIKER! <img src="${PRIZE_ICONS.normal}" class="prize-icon">`;
+            }
+
+            localStorage.setItem(STORAGE_KEY, prizeHTML);
+            prizeDisplay.innerHTML = prizeHTML;
             resultSection.style.display = 'block';
             disableGame();
         }
 
-        function disableGame() { spinBtn.disabled = true; spinBtn.innerText = "KESEMPATAN HABIS"; }
+        function disableGame() { 
+            spinBtn.disabled = true; 
+            spinBtn.innerText = "KESEMPATAN HABIS"; 
+        }
 
         function resetGame() {
-            if (prompt("PIN:") === "1234") { localStorage.removeItem(STORAGE_KEY); location.reload(); }
+            if (prompt("PIN Petugas:") === "1234") { 
+                localStorage.removeItem(STORAGE_KEY); 
+                location.reload(); 
+            }
         }
     </script>
 </body>
