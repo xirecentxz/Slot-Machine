@@ -121,13 +121,13 @@
 <body>
 
     <div class="container">
-        <h1>🌸 J-Event Slot 🌸</h1>
+        <h1>?? J-Event Slot ??</h1>
         <p class="instruction">Scan, Spin, dan Menangkan Hadiah!</p>
 
         <div class="slot-machine">
-            <div id="slot1" class="slot">❓</div>
-            <div id="slot2" class="slot">❓</div>
-            <div id="slot3" class="slot">❓</div>
+            <div id="slot1" class="slot">?</div>
+            <div id="slot2" class="slot">?</div>
+            <div id="slot3" class="slot">?</div>
         </div>
 
         <button id="spin-btn" onclick="startSpin()">MULAI SPIN!</button>
@@ -144,7 +144,7 @@
 
     <script>
         // KONFIGURASI GAME
-        const EMOJIS = ['🌸', '⛩️', '🍣', '🦊', '👺', '🎎'];
+        const EMOJIS = ['??', '??', '??', '??', '??', '??'];
         const STORAGE_KEY = 'event_slot_user_status';
         
         const spinBtn = document.getElementById('spin-btn');
@@ -197,11 +197,11 @@
             const uniqueItems = new Set(results).size;
 
             if (uniqueItems === 1) {
-                prize = "JACKPOT: POSTER! 🏆";
+                prize = "JACKPOT: POSTER! ??";
             } else if (uniqueItems === 2) {
-                prize = "MENANG: GANCI! ✨";
+                prize = "MENANG: GANCI! ?";
             } else {
-                prize = "HADIAH: STIKER! 🌸";
+                prize = "HADIAH: STIKER! ??";
             }
 
             // Simpan status ke localStorage agar tidak bisa refresh
